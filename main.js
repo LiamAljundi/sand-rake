@@ -7,17 +7,20 @@ const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
 
 //Definition of variables
-let particles = []; //array for particles (this is where particles are saved between frames)
+//array for particles (this is where particles are saved between frames)
+let particles = [];
 let distance = 6; //distance between particles
 let columns;
 let rows;
-let resizeTimer; //timer to delay resize events (so it doesn't resize too often)
+//timer to delay resize events (so it doesn't resize too often)
+let resizeTimer;
 let mouseX; //current mouseX position in relation to canvas
 let mouseY; // same but for Y coordinates
-let color = [45, 100, 65]; //hsl color code for particles and background
+let color = [44, 100, 65]; //hsl color code for particles and background
 let rakeSize = 4; //line/stroke size of rake
 let isMouseDown = false;
-const rakes ={ //object with all the rake arrays
+const rakes = {
+  //object with all the rake arrays
   rake3: [-15, 0, 15],
   rake4: [-30, -10, 10, 30],
   rake5: [-40, -20, 0, 20, 40]
@@ -44,15 +47,14 @@ class Particle {
   }
 }
 
-//function that takes array values and turns them into an hsl color string so that we can change only the lightness later
+// function that takes array values and turns them into an hsl color
+// string so that we can change only the lightness later
 function getColorString(hsl) {
   return "hsl(" + hsl[0] + "," + hsl[1] + "%," + hsl[2] + "%)";
-
 }
 
-//Function that redraws the background, particles and rake every frame 
+//Function that redraws the background, particles and rake every frame
 function draw() {
-
   //drawing background
   let background = [...color];
   background[2] -= 20;
@@ -65,7 +67,8 @@ function draw() {
     let relativeX = mouseX - particle.x;
     let relativeY = mouseY - particle.y;
 
-    //Literally updating the particle if it's close to one of the rake teeth if the rake is down
+    // Literally updating the particle if it's close to one of the rake
+    // teeth if the rake is down
     if (isMouseDown) {
       rake.forEach(tooth => {
         let toothY = relativeY + tooth;
@@ -73,11 +76,9 @@ function draw() {
         if (relativeX >= 0) {
           if (relativeX <= distance / 2) {
             xDirection = 1;
-          }
-          else if (relativeX <= distance / 2 + particle.size) {
+          } else if (relativeX <= distance / 2 + particle.size) {
             xDirection = 0;
-          }
-          else if (relativeX <= distance + particle.size) {
+          } else if (relativeX <= distance + particle.size) {
             xDirection = -1;
           }
         }
@@ -89,12 +90,10 @@ function draw() {
               particle.y = particle.y + 1;
               particle.color = [...color];
               particle.color[2] += 15;
-            }
-            else if (toothY <= distance / 2 + particle.size) {
+            } else if (toothY <= distance / 2 + particle.size) {
               particle.x = particle.x + xDirection;
               particle.color = [...color];
-            }
-            else if (toothY <= distance + particle.size) {
+            } else if (toothY <= distance + particle.size) {
               particle.x = particle.x + xDirection;
               particle.y = particle.y - 1;
               particle.color = [...color];
@@ -102,7 +101,7 @@ function draw() {
             }
           }
         }
-      })
+      });
     }
     //draw the particle
     context.fillStyle = getColorString(particle.color);
@@ -123,7 +122,7 @@ function draw() {
   rake.forEach(toothY => {
     context.moveTo(mouseX, mouseY + toothY);
     context.lineTo(mouseX - rakeSize * 2, mouseY + toothY);
-  })
+  });
 
   //drawing rake body
   context.moveTo(mouseX, mouseY + rake[0] - rakeSize / 2);
@@ -141,7 +140,8 @@ function draw() {
   window.requestAnimationFrame(draw);
 }
 
-//Function that positions particles in rows and columns so that they are aligned and spaced evenly
+// Function that positions particles in rows and columns so that they
+// are aligned and spaced evenly
 function positionParticles() {
   columns = Math.round(canvas.width / distance);
   rows = Math.round(canvas.height / distance);
@@ -153,7 +153,7 @@ function positionParticles() {
   }
 }
 
-//Function that calls functions to initiate the canvas
+// Function that calls functions to initiate the canvas
 function resetCanvas() {
   particles = [];
   resizeCanvas(canvas);
@@ -161,7 +161,7 @@ function resetCanvas() {
   draw();
 }
 
-//listener if the screen is resized
+// listener if the screen is resized
 const handleResize = () => {
   if (resizeTimer) {
     clearTimeout(resizeTimer);
@@ -171,9 +171,9 @@ const handleResize = () => {
   }, 50);
 };
 
-//Handle mouse movement function
+// Handle mouse movement function
 function handleMouseMove(event) {
-  //Set mouse variables
+  // Set mouse variables
   mouseX = event.offsetX;
   mouseY = event.offsetY;
 }
@@ -183,28 +183,28 @@ function handleMouseDown(event) {
 function handleMouseUp(event) {
   isMouseDown = false;
 }
-function handleRakeSelect(event){ //uses value from pushed button to select current rake
+function handleRakeSelect(event) {
+  //uses value from pushed button to select current rake
   rake = rakes[event.target.value];
 }
 
-//getting stuff done the first time you load
+// getting stuff done the first time you load
 function onLoad() {
   resetCanvas();
-  //Add the listener 
+  // Add the listener
   canvas.addEventListener("mousemove", handleMouseMove);
-  canvas.addEventListener("mousedown", handleMouseDown); 
-  document.addEventListener("mouseup", handleMouseUp); //the mouseUp will work outside of the canvas
+  canvas.addEventListener("mousedown", handleMouseDown);
+  // the mouseUp will work outside of the canvas
+  document.addEventListener("mouseup", handleMouseUp);
   window.addEventListener("resize", handleResize);
   document.getElementById("reset").addEventListener("click", resetCanvas);
-  //select all radio buttons from html and loop through them and add event listeners
+  // select all radio buttons from html and loop through them and add
+  // event listeners
   let rakeButtons = document.getElementsByClassName("rakeSelect");
-  for (i=0; i<rakeButtons.length; i++){
+  for (i = 0; i < rakeButtons.length; i++) {
     rakeButtons[i].addEventListener("click", handleRakeSelect);
   }
 }
 
 //defining function that runs on load
 window.onload = onLoad;
-
-
-
